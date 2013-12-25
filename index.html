@@ -1,0 +1,132 @@
+<html> 
+<head> 
+	<title>10-mila Prewarning 2014</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<!-- <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.css" /> -->
+	<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/51126286/10milaprewarning/jquery.mobile-1.2.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
+<script src="http://192.168.1.23:3000/socket.io/socket.io.js"></script>
+<script>
+ $(document).ready(function() {
+ var socket  = io.connect('http://192.168.1.23:3000');
+ var filtervalue='';
+ var filterdata='';
+ $('#save').click(function() {
+    
+   // filterdata = {
+     // bib: $('#bibfilter').val()
+      //$('#bibfilter').val()
+    //}; 
+	filterdata = $('#bibfilter').val();
+	console.log(filterdata);
+	
+	filtervalue = filterdata.split(/[, ]/);
+	console.log(filtervalue);
+	//$.each(filter, function(key, value) {
+	
+	//console.log(value);
+	//filtervalue = value;
+	//$('#shobibfilter').html(value);
+    //socket.emit('bib', data);
+    //$('#employee_name').val('');
+    //$('#employee_salary').val('');
+  //});
+  });
+
+  $('#clear').click(function() {
+	filtervalue='';
+	filterdata='';
+    
+  });
+  socket.on('connect', function(){
+  console.log('Socket: Connect');
+  $('#online').html('<p style="color:blue;text-align:center">Prewarning - <b>Online</b></p>');
+  });
+  socket.on('error', function(){
+  console.log('Socket: ERROR');
+  $('#online').html('<p style="color:red;text-align:center">Prewarning - <b>Offline</b></p>');
+  });
+  socket.on('time', function(data) {
+  $('#online').html('<p style="color:green;text-align:center">Prewarning - <b>Online - '+data+'</b></p>');
+  });
+  socket.on('prewarning', function(data) {
+    var out = "";
+	//console.log(data);
+    //out += '<table border="1"><tr><th>Bib</th><th>Time</th></tr>';
+    //out += '<ul data-role="listview" data-inset="true">';
+	$.each(data, function(key, value) {
+	
+	//console.log(value.BibNumber+" "+value.Time);
+			//$.each(value, function(key2, value2) {
+      //out += "<tr><td>"+value.BibNumber+"</td><td>"+value.Time+"</td></tr>";
+	  //console.log('filtervalue prewarning: '+filtervalue+' Bib: '+value.BibNumber);
+     //if(value.BibNumber===filtervalue) { out += "<li>"+value.BibNumber+" - "+value.Time+"</li>";};
+     //if(filtervalue==='') { out += "<li>"+value.BibNumber+" - "+value.Time+"</li>";};
+	 $.each(filtervalue, function(index,filtervalue2) {
+	 console.log('FILTER: '+filtervalue+';');
+	 console.log('FILTER2: '+filtervalue2+';');
+	 if(value.BibNumber===filtervalue2) { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - "+value.Time+"</li>";};
+     });
+	 if(filtervalue==='') { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - "+value.Time+"</li>";};
+	 
+    //});
+	});
+    //out += "</table> ";
+    //out += "</ul> ";
+	$('#prewarning').html(out);
+	$('#prewarning').listview('refresh');
+	
+  });
+  
+  
+  socket.on('finish', function(data) {
+    var out = "";
+	//console.log(data);
+    //out += '<table border="1"><tr><th>Bib</th><th>Time</th></tr>';
+    //out += '<ul data-role="listview" data-inset="true">';
+	$.each(data, function(key, value) {
+	
+	
+	//console.log(value.BibNumber+" "+value.Time);
+			//$.each(value, function(key2, value2) {
+      //out += "<tr><td>"+value.BibNumber+"</td><td>"+value.Time+"</td></tr>";
+	  //console.log('filtervalue finish: '+filtervalue+' Bib: '+value.BibNumber);
+     //if(value.BibNumber===filtervalue) { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - "+value.Time+"</li>";};
+     //if(filtervalue==='') { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - "+value.Time+"</li>";};
+	  //$("li").filter(contains(value.BibNumber)).append(" - Finish");
+	  //$( "div:contains('John')" ).css( "text-decoration", "underline" );
+	  $("li").filter("."+value.BibNumber).append(" - Finish: "+value.Time).addClass("ui-li-10mila-finish");
+	  
+    //});
+	});
+    //out += "</table> ";
+    //out += "</ul> ";
+	//$('#prewarning').html(out);
+	//$('#prewarning').listview('refresh');
+	
+  });
+});
+</script>
+
+	</head> 
+<body> 
+
+<!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->
+<div id=online></div>
+<!-- <input type="search" name="search" id="bibfilter" value="" />   -->
+<fieldset class="ui-grid-b">
+	<div class="ui-block-a"><input type="text" placeholder="11 567 23" id="bibfilter" value="" data-theme="c"></div>
+	<div class="ui-block-b"><button type="submit" id="save" data-theme="b">Filter</button></div>	   
+	<div class="ui-block-b"><button type="submit" id="clear" data-theme="b">Clear</button></div>	   
+</fieldset>
+<!-- <div>Bib: <input type="text" id="bib" value=""></div>
+<div id="bib2"></div>
+<div><input type="button" value="Save" id="save"></div>
+ 
+<br>
+ -->
+<!-- <ul id="prewarning" data-role="listview" data-filter="true"></ul> -->
+<ul id="prewarning" data-role="listview"></ul>
+</body>
+</html>

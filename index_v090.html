@@ -1,0 +1,75 @@
+<html> 
+<head> 
+	<title>My Page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
+<script src="http://192.168.1.23:3000/socket.io/socket.io.js"></script>
+
+	</head> 
+<body> 
+
+<!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->
+
+<script>
+ $(document).ready(function() {
+  var socket  = io.connect('http://192.168.1.23:3000');
+ var filtervalue='';
+  $('#save').click(function() {
+    
+    var data = {
+      bib: $('#bibfilter').val()
+    };
+	//console.log(data);
+	$.each(data, function(key, value) {
+	
+	console.log(value);
+	filtervalue = value;
+	//$('#shobibfilter').html(value);
+    //socket.emit('bib', data);
+    //$('#employee_name').val('');
+    //$('#employee_salary').val('');
+  });
+  });
+ 
+  socket.on('prewarning', function(data) {
+    var out = "";
+	//console.log(data);
+    //out += '<table border="1"><tr><th>Bib</th><th>Time</th></tr>';
+    //out += '<ul data-role="listview" data-inset="true">';
+	$.each(data, function(key, value) {
+	
+	//console.log(value.BibNumber+" "+value.Time);
+			//$.each(value, function(key2, value2) {
+      //out += "<tr><td>"+value.BibNumber+"</td><td>"+value.Time+"</td></tr>";
+	  console.log('filtervalue: '+filtervalue);
+     if(value.BibNumber===filtervalue) { out += "<li>"+value.BibNumber+" - "+value.Time+"</li>";};
+     if(filtervalue==='') { out += "<li>"+value.BibNumber+" - "+value.Time+"</li>";};
+	 
+    //});
+	});
+    //out += "</table> ";
+    //out += "</ul> ";
+	$('#prewarning').html(out);
+	$('#prewarning').listview('refresh');
+	
+  });
+});
+</script>
+<h2>Prewarning</h2>
+<!-- <input type="search" name="search" id="bibfilter" value="" />   -->
+<fieldset class="ui-grid-a">
+	<div class="ui-block-a"><input type="number" id="bibfilter" value="" data-theme="c"></div>
+	<div class="ui-block-b"><button type="submit" id="save" data-theme="b">Filter</button></div>	   
+</fieldset>
+<!-- <div>Bib: <input type="text" id="bib" value=""></div>
+<div id="bib2"></div>
+<div><input type="button" value="Save" id="save"></div>
+ 
+<br>
+ -->
+<!-- <ul id="prewarning" data-role="listview" data-filter="true"></ul> -->
+<ul id="prewarning" data-role="listview"></ul>
+</body>
+</html>
