@@ -6,56 +6,21 @@
 	<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/51126286/10milaprewarning/jquery.mobile-1.2.1.min.css" />
 	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
-<script src="http://192.168.1.23:3000/socket.io/socket.io.js"></script>
+<script src="http://192.168.1.16:3000/socket.io/socket.io.js"></script>
 <script>
  $(document).ready(function() {
- var socket  = io.connect('http://192.168.1.23:3000');
+ var socket  = io.connect('http://192.168.1.16:3000');
  var filtervalue='';
  var filterdata='';
- $('#save').click(function() {
-    
-   // filterdata = {
-     // bib: $('#bibfilter').val()
-      //$('#bibfilter').val()
-    //}; 
-	filterdata = $('#bibfilter').val();
-	console.log(filterdata);
-	
-	filtervalue = filterdata.split(/[, ]/);
-	console.log(filtervalue);
-	//$.each(filter, function(key, value) {
-	
-	//console.log(value);
-	//filtervalue = value;
-	//$('#shobibfilter').html(value);
-    //socket.emit('bib', data);
-    //$('#employee_name').val('');
-    //$('#employee_salary').val('');
-  //});
-  });
+  var prewarningdata='';
 
-  $('#clear').click(function() {
-	filtervalue='';
-	filterdata='';
-    
-  });
-  socket.on('connect', function(){
-  console.log('Socket: Connect');
-  $('#online').html('<p style="color:blue;text-align:center">Prewarning - <b>Online</b></p>');
-  });
-  socket.on('error', function(){
-  console.log('Socket: ERROR');
-  $('#online').html('<p style="color:red;text-align:center">Prewarning - <b>Offline</b></p>');
-  });
-  socket.on('time', function(data) {
-  $('#online').html('<p style="color:green;text-align:center">Prewarning - <b>Online - '+data+'</b></p>');
-  });
-  socket.on('prewarning', function(data) {
-    var out = "";
-	//console.log(data);
+function renderData()
+{
+var out = "";
+	console.log("renderdata");
     //out += '<table border="1"><tr><th>Bib</th><th>Time</th></tr>';
     //out += '<ul data-role="listview" data-inset="true">';
-	$.each(data, function(key, value) {
+	$.each(prewarningdata, function(key, value) {
 	
 	//console.log(value.BibNumber+" "+value.Time);
 			//$.each(value, function(key2, value2) {
@@ -76,6 +41,55 @@
     //out += "</ul> ";
 	$('#prewarning').html(out);
 	$('#prewarning').listview('refresh');
+	
+  
+};
+
+
+ $('#save').click(function() {
+    
+   // filterdata = {
+     // bib: $('#bibfilter').val()
+      //$('#bibfilter').val()
+    //}; 
+	filterdata = $('#bibfilter').val();
+	console.log(filterdata);
+	
+	filtervalue = filterdata.split(/[, ]/);
+	console.log(filtervalue);
+	//$.each(filter, function(key, value) {
+	
+	//console.log(value);
+	//filtervalue = value;
+	//$('#shobibfilter').html(value);
+    //socket.emit('bib', data);
+    //$('#employee_name').val('');
+    //$('#employee_salary').val('');
+  //});
+  renderData();
+
+  });
+
+  $('#clear').click(function() {
+	filtervalue='';
+	filterdata='';
+  renderData();
+    
+  });
+  socket.on('connect', function(){
+  console.log('Socket: Connect');
+  $('#online').html('<p style="color:blue;text-align:center">Prewarning - <b>Online</b></p>');
+  });
+  socket.on('error', function(){
+  console.log('Socket: ERROR');
+  $('#online').html('<p style="color:red;text-align:center">Prewarning - <b>Offline</b></p>');
+  });
+  socket.on('time', function(data) {
+  $('#online').html('<p style="color:green;text-align:center">Prewarning - <b>Online - '+data+'</b></p>');
+  });
+  socket.on('prewarning', function(data) {
+	prewarningdata=data;
+  renderData();
 	
   });
   
