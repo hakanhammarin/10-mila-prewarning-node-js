@@ -14,6 +14,21 @@ var http = require('http').createServer(function handler(req, res) {
     }
   });
 }).listen(3000);
+var currentPrewarning='';
+var currentFinish='';
+
+var querystring = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "135" OR controls.id = "41" ORDER BY splittimes.passedTime DESC LIMIT 0,100;';
+
+var querystringfinish = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "100"  OR controls.id = "200" ORDER BY splittimes.passedTime DESC LIMIT 0,100;';
+
+
+//var querystring = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE splittimes.modifyDate > "2013-05-04 21:38:28.820" AND controls.id = "200" ORDER BY splittimes.passedTime desc LIMIT '+(listsize)+',20;';
+//var querystringfinish = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE splittimes.modifyDate > "2013-05-04 21:38:28.820" AND controls.id = "200" ORDER BY splittimes.passedTime desc LIMIT '+(listsize+10)+',10;';
+
+
+// var querystringlastcontrol = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "100"  OR controls.id = "200" ORDER BY splittimes.passedTime  LIMIT 0,100;';
+// var querystring = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE splittimes.modifyDate > "2013-05-04 10:38:28.820" AND controls.id = "200" ORDER BY splittimes.passedTime desc LIMIT 0,100;';
+
 
 function checkTime(i)
 {
@@ -42,22 +57,20 @@ io.set('log level', 1);
 io.sockets.on('connection', function(socket) {
   console.log('Client connected');
   socket.join('subscribe');
+  io.sockets.emit('prewarning', currentPrewarning); 
+  io.sockets.emit('finish', currentFinish); 
   
  });
  
 setInterval(function() { console.log("SQL Query: every 10 second!"); 
 
-var querystring = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "135" OR controls.id = "41" ORDER BY splittimes.passedTime DESC LIMIT 0,100;';
-//var querystring = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE splittimes.modifyDate > "2013-05-04 21:38:28.820" AND controls.id = "200" ORDER BY splittimes.passedTime desc LIMIT '+(listsize)+',20;';
-//var querystringfinish = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE splittimes.modifyDate > "2013-05-04 21:38:28.820" AND controls.id = "200" ORDER BY splittimes.passedTime desc LIMIT '+(listsize+10)+',10;';
-var querystringfinish = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "100"  OR controls.id = "200" ORDER BY splittimes.passedTime DESC LIMIT 0,100;';
-// var querystringlastcontrol = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "100"  OR controls.id = "200" ORDER BY splittimes.passedTime  LIMIT 0,100;';
-// var querystring = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE splittimes.modifyDate > "2013-05-04 10:38:28.820" AND controls.id = "200" ORDER BY splittimes.passedTime desc LIMIT 0,100;';
 client.query(querystring, function(err, results, fields) {
 	io.sockets.emit('prewarning', results); 
-  });
+	currentPrewarning=results;
+	});
 client.query(querystringfinish, function(err, results, fields) {
 	io.sockets.emit('finish', results); 
+	currentFinish=results;
   });
   
   var today=new Date();
@@ -73,7 +86,7 @@ client.query(querystringfinish, function(err, results, fields) {
  listsize += 1
   
   
-  }, 5000);
+  }, 10000);
   
  // splittimes.get_splittimes(function(times) {
    // console.log(times);
