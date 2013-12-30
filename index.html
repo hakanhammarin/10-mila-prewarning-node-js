@@ -6,10 +6,10 @@
 	<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/51126286/10milaprewarning/jquery.mobile-1.2.1.min.css" />
 	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
-<script src="http://192.168.1.16:3000/socket.io/socket.io.js"></script>
+<script src="http://192.168.1.26:3000/socket.io/socket.io.js"></script>
 <script>
  $(document).ready(function() {
- var socket  = io.connect('http://192.168.1.16:3000');
+ var socket  = io.connect('http://192.168.1.26:3000');
  var filtervalue='';
  var filterdata='';
   var prewarningdata='';
@@ -31,9 +31,9 @@ var out = "";
 	 $.each(filtervalue, function(index,filtervalue2) {
 	 console.log('FILTER: '+filtervalue+';');
 	 console.log('FILTER2: '+filtervalue2+';');
-	 if(value.BibNumber===filtervalue2) { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - "+value.Time+"</li>";};
+	 if(value.BibNumber===filtervalue2) { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - PW: "+value.Time+"</li>";};
      });
-	 if(filtervalue==='') { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - "+value.Time+"</li>";};
+	 if(filtervalue==='') { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - PW: "+value.Time+"</li>";};
 	 
     //});
 	});
@@ -110,7 +110,7 @@ var out = "";
      //if(filtervalue==='') { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - "+value.Time+"</li>";};
 	  //$("li").filter(contains(value.BibNumber)).append(" - Finish");
 	  //$( "div:contains('John')" ).css( "text-decoration", "underline" );
-	  $("li").filter("."+value.BibNumber).append(" - Finish: "+value.Time).addClass("ui-li-10mila-finish");
+	  $("li").filter("."+value.BibNumber).append(" - LC: "+value.Time).addClass("ui-li-10mila-finish");
 	  
     //});
 	});
