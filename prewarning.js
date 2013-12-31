@@ -3,6 +3,8 @@ var splittimes = require("./splittimes.js");
 var fs = require('fs');
 var warnings = 'no warnings' ;
 var listsize = 1;
+var clientConnections=0;
+
 var http = require('http').createServer(function handler(req, res) {
     fs.readFile(__dirname + '/index.html', function(err, data) {
     if (err) {
@@ -21,15 +23,6 @@ var querystring = 'SELECT results.bibNumber as BibNumber, entries.teamName as te
 
 var querystringfinish = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "100"  OR controls.id = "200" ORDER BY splittimes.passedTime DESC LIMIT 0,100;';
 
-
-//var querystring = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE splittimes.modifyDate > "2013-05-04 21:38:28.820" AND controls.id = "200" ORDER BY splittimes.passedTime desc LIMIT '+(listsize)+',20;';
-//var querystringfinish = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE splittimes.modifyDate > "2013-05-04 21:38:28.820" AND controls.id = "200" ORDER BY splittimes.passedTime desc LIMIT '+(listsize+10)+',10;';
-
-
-// var querystringlastcontrol = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "100"  OR controls.id = "200" ORDER BY splittimes.passedTime  LIMIT 0,100;';
-// var querystring = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE splittimes.modifyDate > "2013-05-04 10:38:28.820" AND controls.id = "200" ORDER BY splittimes.passedTime desc LIMIT 0,100;';
-
-
 function checkTime(i)
 {
 if (i<10)
@@ -39,8 +32,6 @@ if (i<10)
 return i;
 }
 
-
-  
 var mysql = require('mysql');
 var MYSQL_USERNAME = 'root';
 var MYSQL_PASSWORD = 'root';
@@ -59,15 +50,26 @@ io.sockets.on('connection', function(socket) {
   socket.join('subscribe');
   io.sockets.emit('prewarning', currentPrewarning); 
   io.sockets.emit('finish', currentFinish); 
+  clientConnections += 1;
+  console.log('Initiated Connections: '+clientConnections);
   
  });
  
-setInterval(function() { console.log("SQL Query: every 10 second!"); 
+setInterval(function() { 
+	var today=new Date();
+	var h=today.getHours();
+	var m=today.getMinutes();
+	var s=today.getSeconds();
+	m=checkTime(m);
+	s=checkTime(s);
+	h=checkTime(h);
+  
+	console.log(h+':'+m+':'+s+' SQL Query: '+io.sockets.clients().length+' Connections'); 
 
 client.query(querystring, function(err, results, fields) {
 	io.sockets.emit('prewarning', results); 
 	currentPrewarning=results;
-	console.log(results);
+	// console.log(results);
 	});
 client.query(querystringfinish, function(err, results, fields) {
 	io.sockets.emit('finish', results); 
