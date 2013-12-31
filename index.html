@@ -13,33 +13,35 @@
  var filtervalue='';
  var filterdata='';
   var prewarningdata='';
+  var finishdata='';
 
+function renderFinishData()
+ {
+    var out = "";
+	console.log("renderFinishData");
+	$.each(finishdata, function(key, value) {
+	
+		$("p").filter("."+value.BibNumber).append(" - LC: <strong>"+value.Time+"</strong>").addClass("ui-li-10mila-finish");
+	  
+    });
+    
+  };
+  
 function renderData()
 {
 var out = "";
 	console.log("renderdata");
-    //out += '<table border="1"><tr><th>Bib</th><th>Time</th></tr>';
-    //out += '<ul data-role="listview" data-inset="true">';
-	$.each(prewarningdata, function(key, value) {
-	
-	//console.log(value.BibNumber+" "+value.Time);
-			//$.each(value, function(key2, value2) {
-      //out += "<tr><td>"+value.BibNumber+"</td><td>"+value.Time+"</td></tr>";
-	  //console.log('filtervalue prewarning: '+filtervalue+' Bib: '+value.BibNumber);
-     //if(value.BibNumber===filtervalue) { out += "<li>"+value.BibNumber+" - "+value.Time+"</li>";};
-     //if(filtervalue==='') { out += "<li>"+value.BibNumber+" - "+value.Time+"</li>";};
-	 $.each(filtervalue, function(index,filtervalue2) {
-	 console.log('FILTER: '+filtervalue+';');
-	 console.log('FILTER2: '+filtervalue2+';');
-	 if(value.BibNumber===filtervalue2) { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - PW: "+value.Time+"</li>";};
-     });
-	 if(filtervalue==='') { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - PW: "+value.Time+"</li>";};
-	 
-    //});
+    $.each(prewarningdata, function(key, value) {
+    $.each(filtervalue, function(index,filtervalue2) {
+		//console.log('FILTER: '+filtervalue+';');
+		//console.log('FILTER2: '+filtervalue2+';');
+		if(value.BibNumber===filtervalue2) { out += "<li class='"+value.BibNumber+"'><strong>"+value.BibNumber+"</strong> - PW: "+value.Time+"</li>";};
 	});
-    //out += "</table> ";
-    //out += "</ul> ";
-	$('#prewarning').html(out);
+	if(filtervalue==='') { 
+	out += '<li><h3>'+value.BibNumber+' - Club Team 1 </h3><p class="'+value.BibNumber+'">PW: <strong>'+value.Time+'</strong></p> </li>';};
+	 
+    });
+    $('#prewarning').html(out);
 	$('#prewarning').listview('refresh');
 	
   
@@ -67,6 +69,7 @@ var out = "";
     //$('#employee_salary').val('');
   //});
   renderData();
+  renderFinishData();
 
   });
 
@@ -74,6 +77,8 @@ var out = "";
 	filtervalue='';
 	filterdata='';
   renderData();
+    renderFinishData();
+
     
   });
   socket.on('connect', function(){
@@ -87,38 +92,17 @@ var out = "";
   socket.on('time', function(data) {
   $('#online').html('<p style="color:green;text-align:center">Prewarning - <b>Online - '+data+'</b></p>');
   });
+  
   socket.on('prewarning', function(data) {
-	prewarningdata=data;
+  prewarningdata=data;
   renderData();
 	
   });
   
   
   socket.on('finish', function(data) {
-    var out = "";
-	//console.log(data);
-    //out += '<table border="1"><tr><th>Bib</th><th>Time</th></tr>';
-    //out += '<ul data-role="listview" data-inset="true">';
-	$.each(data, function(key, value) {
-	
-	
-	//console.log(value.BibNumber+" "+value.Time);
-			//$.each(value, function(key2, value2) {
-      //out += "<tr><td>"+value.BibNumber+"</td><td>"+value.Time+"</td></tr>";
-	  //console.log('filtervalue finish: '+filtervalue+' Bib: '+value.BibNumber);
-     //if(value.BibNumber===filtervalue) { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - "+value.Time+"</li>";};
-     //if(filtervalue==='') { out += "<li class='"+value.BibNumber+"'>"+value.BibNumber+" - "+value.Time+"</li>";};
-	  //$("li").filter(contains(value.BibNumber)).append(" - Finish");
-	  //$( "div:contains('John')" ).css( "text-decoration", "underline" );
-	  $("li").filter("."+value.BibNumber).append(" - LC: "+value.Time).addClass("ui-li-10mila-finish");
-	  
-    //});
-	});
-    //out += "</table> ";
-    //out += "</ul> ";
-	//$('#prewarning').html(out);
-	//$('#prewarning').listview('refresh');
-	
+  finishdata=data;
+  renderFinishData();
   });
 });
 </script>
@@ -130,7 +114,7 @@ var out = "";
 <div id=online></div>
 <!-- <input type="search" name="search" id="bibfilter" value="" />   -->
 <fieldset class="ui-grid-b">
-	<div class="ui-block-a"><input type="text" placeholder="11 567 23" id="bibfilter" value="" data-theme="c"></div>
+	<div class="ui-block-a"><input type="text" placeholder="e.g. 101 567 203" id="bibfilter" value="" data-theme="c"></div>
 	<div class="ui-block-b"><button type="submit" id="save" data-theme="b">Filter</button></div>	   
 	<div class="ui-block-b"><button type="submit" id="clear" data-theme="b">Clear</button></div>	   
 </fieldset>
@@ -143,4 +127,7 @@ var out = "";
 <!-- <ul id="prewarning" data-role="listview" data-filter="true"></ul> -->
 <ul id="prewarning" data-role="listview"></ul>
 </body>
+<div data-role="footer"> 
+	<h4>Bib - PW (Pre Warning) - LC (Last Control)</h4>
+</div> 
 </html>
