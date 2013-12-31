@@ -1,86 +1,61 @@
-<html> 
-<head> 
-	<title>10-mila Prewarning 2014</title> 
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<html>
+<head>
+	<title>10-mila Prewarning 2014</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.css" /> -->
 	<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/51126286/10milaprewarning/jquery.mobile-1.2.1.min.css" />
 	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
 <script src="http://192.168.1.26:3000/socket.io/socket.io.js"></script>
 <script>
- $(document).ready(function() {
+$(document).ready(function() {
  var socket  = io.connect('http://192.168.1.26:3000');
  var filtervalue='';
  var filterdata='';
-  var prewarningdata='';
-  var finishdata='';
-
+ var prewarningdata='';
+ var finishdata='';
 function renderFinishData()
  {
     var out = "";
 	console.log("renderFinishData");
 	$.each(finishdata, function(key, value) {
-	
 		$("p").filter("."+value.BibNumber).append(" - LC: <strong>"+value.Time+"</strong>").addClass("ui-li-10mila-finish");
-	  
     });
-    
   };
-  
 function renderData()
 {
 var out = "";
 	console.log("renderdata");
     $.each(prewarningdata, function(key, value) {
-    $.each(filtervalue, function(index,filtervalue2) {
-		//console.log('FILTER: '+filtervalue+';');
-		//console.log('FILTER2: '+filtervalue2+';');
-		if(value.BibNumber===filtervalue2) { out += "<li class='"+value.BibNumber+"'><strong>"+value.BibNumber+"</strong> - PW: "+value.Time+"</li>";};
+		$.each(filtervalue, function(index,filtervalue2) {
+			//console.log('FILTER: '+filtervalue+';');
+			//console.log('FILTER2: '+filtervalue2+';');
+			if(value.BibNumber===filtervalue2) { 
+//				out += "<li class='"+value.BibNumber+"'><strong>"+value.BibNumber+"</strong> - PW: "+value.Time+"</li>";
+			out += '<li><h3>'+value.BibNumber+' &middot; '+value.teamName+' &middot; '+value.Leg+'</h3><p class="'+value.BibNumber+'">PW: <strong>'+value.Time+'</strong></p> </li>';
+			};
+		});
+		if(filtervalue==='') {
+			out += '<li><h3>'+value.BibNumber+' &middot; '+value.teamName+' &middot; '+value.Leg+'</h3><p class="'+value.BibNumber+'">PW: <strong>'+value.Time+'</strong></p> </li>';
+			};
 	});
-	if(filtervalue==='') { 
-	out += '<li><h3>'+value.BibNumber+' - Club Team 1 </h3><p class="'+value.BibNumber+'">PW: <strong>'+value.Time+'</strong></p> </li>';};
-	 
-    });
     $('#prewarning').html(out);
 	$('#prewarning').listview('refresh');
-	
-  
 };
-
-
- $('#save').click(function() {
-    
-   // filterdata = {
-     // bib: $('#bibfilter').val()
-      //$('#bibfilter').val()
-    //}; 
+$('#save').click(function() {
 	filterdata = $('#bibfilter').val();
 	console.log(filterdata);
-	
 	filtervalue = filterdata.split(/[, ]/);
 	console.log(filtervalue);
-	//$.each(filter, function(key, value) {
-	
-	//console.log(value);
-	//filtervalue = value;
-	//$('#shobibfilter').html(value);
-    //socket.emit('bib', data);
-    //$('#employee_name').val('');
-    //$('#employee_salary').val('');
-  //});
-  renderData();
-  renderFinishData();
-
-  });
-
-  $('#clear').click(function() {
+	renderData();
+	renderFinishData();
+});
+$('#clear').click(function() {
 	filtervalue='';
 	filterdata='';
-  renderData();
+	renderData();
     renderFinishData();
-
-    
-  });
+});
   socket.on('connect', function(){
   console.log('Socket: Connect');
   $('#online').html('<p style="color:blue;text-align:center">Prewarning - <b>Online</b></p>');
@@ -92,42 +67,35 @@ var out = "";
   socket.on('time', function(data) {
   $('#online').html('<p style="color:green;text-align:center">Prewarning - <b>Online - '+data+'</b></p>');
   });
-  
   socket.on('prewarning', function(data) {
   prewarningdata=data;
   renderData();
-	
   });
-  
-  
   socket.on('finish', function(data) {
   finishdata=data;
   renderFinishData();
   });
 });
 </script>
-
-	</head> 
-<body> 
-
+	</head>
+<body>
 <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->
 <div id=online></div>
 <!-- <input type="search" name="search" id="bibfilter" value="" />   -->
 <fieldset class="ui-grid-b">
 	<div class="ui-block-a"><input type="text" placeholder="e.g. 101 567 203" id="bibfilter" value="" data-theme="c"></div>
-	<div class="ui-block-b"><button type="submit" id="save" data-theme="b">Filter</button></div>	   
-	<div class="ui-block-b"><button type="submit" id="clear" data-theme="b">Clear</button></div>	   
+	<div class="ui-block-b"><button type="submit" id="save" data-theme="b">Filter</button></div>
+	<div class="ui-block-b"><button type="submit" id="clear" data-theme="b">Clear</button></div>
 </fieldset>
 <!-- <div>Bib: <input type="text" id="bib" value=""></div>
 <div id="bib2"></div>
 <div><input type="button" value="Save" id="save"></div>
- 
 <br>
  -->
 <!-- <ul id="prewarning" data-role="listview" data-filter="true"></ul> -->
 <ul id="prewarning" data-role="listview"></ul>
 </body>
-<div data-role="footer"> 
+<div data-role="footer">
 	<h4>Bib - PW (Pre Warning) - LC (Last Control)</h4>
-</div> 
+</div>
 </html>

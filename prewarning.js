@@ -17,7 +17,7 @@ var http = require('http').createServer(function handler(req, res) {
 var currentPrewarning='';
 var currentFinish='';
 
-var querystring = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "135" OR controls.id = "41" ORDER BY splittimes.passedTime DESC LIMIT 0,100;';
+var querystring = 'SELECT results.bibNumber as BibNumber, entries.teamName as teamName,results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "135" OR controls.id = "41" ORDER BY splittimes.passedTime DESC LIMIT 0,100;';
 
 var querystringfinish = 'SELECT results.bibNumber as BibNumber, results.relayPersonOrder AS Leg, SUBSTR(passedTime,12,8) as Time ,controls.id as Control FROM splittimes INNER JOIN splittimecontrols ON splittimecontrols.splitTimeControlId=splittimes.splitTimeControlId INNER JOIN controls ON controls.controlId=splittimecontrols.timingControl INNER JOIN results ON splittimes.resultRaceIndividualNumber = results.resultId INNER JOIN entries ON entries.entryID = results.EntryId WHERE controls.id = "100"  OR controls.id = "200" ORDER BY splittimes.passedTime DESC LIMIT 0,100;';
 
@@ -67,6 +67,7 @@ setInterval(function() { console.log("SQL Query: every 10 second!");
 client.query(querystring, function(err, results, fields) {
 	io.sockets.emit('prewarning', results); 
 	currentPrewarning=results;
+	console.log(results);
 	});
 client.query(querystringfinish, function(err, results, fields) {
 	io.sockets.emit('finish', results); 
