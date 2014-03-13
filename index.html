@@ -6,10 +6,24 @@
 	<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/51126286/10milaprewarning/jquery.mobile-1.2.1.min.css" />
 	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
-<script src="http://192.168.1.26:3000/socket.io/socket.io.js"></script>
+<script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+	<script src="//cdn.flurry.com/js/flurry.js"></script>
 <script>
 $(document).ready(function() {
- var socket  = io.connect('http://192.168.1.26:3000');
+		FlurryAgent.startSession('7TNHDKBF6NRF2FHTCHRJ');
+		//var env = {};
+		//env['os'] = 'iOS'; // determine the OS
+		//env['browser'] = 'Safari'; // determine the browser
+		//FlurryAgent.logEvent('environment', env); // save the OS and Browser
+		//console.log(env); 
+		var flurryConnect ={};
+		flurryConnect['Session'] = '';
+		var flurryAction ={};
+		flurryAction['Action'] = '';
+		
+		
+
+ var socket  = io.connect('http://127.0.0.1:3000');
  var filtervalue='';
  var filterdata='';
  var prewarningdata='';
@@ -43,7 +57,9 @@ var out = "";
 	$('#prewarning').listview('refresh');
 };
 $('#save').click(function() {
-	filterdata = $('#bibfilter').val();
+	flurryAction['Action'] = 'Filter';
+  FlurryAgent.logEvent('Action',flurryAction);
+  filterdata = $('#bibfilter').val();
 	console.log(filterdata);
 	filtervalue = filterdata.split(/[, ]/);
 	console.log(filtervalue);
@@ -57,14 +73,21 @@ $('#clear').click(function() {
     renderFinishData();
 });
   socket.on('connect', function(){
+  flurryConnect['Session'] = 'Connect';
+  FlurryAgent.logEvent('Session',flurryConnect);
+  console.log(flurryConnect);
   console.log('Socket: Connect');
   $('#online').html('<p style="color:blue;text-align:center">Prewarning - <b>Online</b></p>');
   });
   socket.on('error', function(){
+  flurryConnect['Session'] = 'Error';
+  FlurryAgent.logEvent('Session',flurryConnect);
   console.log('Socket: ERROR');
   $('#online').html('<p style="color:red;text-align:center">Prewarning - <b>Offline</b></p>');
   });
   socket.on('disconnect', function(){
+  flurryConnect['Session'] = 'Disconnect';
+  FlurryAgent.logEvent('Session',flurryConnect);
   console.log('Socket: Disconnect');
   $('#online').html('<p style="color:red;text-align:center">Prewarning - <b>Offline</b></p>');
   });

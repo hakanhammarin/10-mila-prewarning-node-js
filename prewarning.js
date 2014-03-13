@@ -69,7 +69,7 @@ setInterval(function() {
 client.query(querystring, function(err, results, fields) {
 	io.sockets.emit('prewarning', results); 
 	currentPrewarning=results;
-	// console.log(results);
+	 console.log(results);
 	});
 client.query(querystringfinish, function(err, results, fields) {
 	io.sockets.emit('finish', results); 
